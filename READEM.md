@@ -110,7 +110,7 @@ crop-disease-detection/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/crop-disease-detection.git
+git clone https://github.com/SunnyKushwaha272/Crop-Disease-Detection-
 cd crop-disease-detection
 ```
 
