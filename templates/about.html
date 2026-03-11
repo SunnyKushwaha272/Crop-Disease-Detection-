@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+  :root {
+    --g1: #0a2e1a; --g2: #1a5c35; --g3: #2d8a54;
+    --g4: #52b788; --g5: #b7e4c7;
+  }
+
+  .about-wrap {
+    font-family: 'DM Sans', sans-serif;
+    max-width: 900px; margin: 0 auto; padding: 40px 20px 60px;
+  }
+
+  /* Hero */
+  .about-hero {
+    background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 60%, var(--g3) 100%);
+    border-radius: 24px; padding: 52px 48px;
+    position: relative; overflow: hidden; margin-bottom: 40px;
+  }
+  .about-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .about-hero::after {
+    content: ''; position: absolute;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(82,183,136,0.2) 0%, transparent 70%);
+    top: -120px; right: -80px; pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px; padding: 5px 14px;
+    color: var(--g5); font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 20px; position: relative; z-index: 1;
+  }
+  .about-hero h1 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    color: #fff; margin: 0 0 14px;
+    position: relative; z-index: 1; line-height: 1.1;
+  }
+  .about-hero h1 span { color: var(--g4); }
+  .about-hero p {
+    color: rgba(255,255,255,0.7); font-size: 0.97rem;
+    line-height: 1.7; max-width: 580px;
+    position: relative; z-index: 1; margin: 0;
+  }
+
+  /* Section title */
+  .sec-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.1rem; color: var(--g1);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; margin-top: 40px;
+  }
+  .sec-title .ibox {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--g3), var(--g2));
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 8px;
+  }
+  .fcard {
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 16px; padding: 20px 18px; transition: all 0.22s;
+  }
+  .fcard:hover { border-color: var(--g4); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(45,106,79,0.1); }
+  .fcard .fi { font-size: 1.6rem; margin-bottom: 10px; }
+  .fcard .ft { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--g1); margin-bottom: 4px; }
+  .fcard .fd { font-size: 0.78rem; color: #6b7280; line-height: 1.5; }
+
+  /* Model cards */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .mcard {
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 18px; padding: 24px 22px;
+    position: relative; overflow: hidden;
+  }
+  .mcard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .mcard.potato::before { background: linear-gradient(90deg, #f4a261, #e76f51); }
+  .mcard.tomato::before { background: linear-gradient(90deg, var(--g3), var(--g4)); }
+  .mbadge {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 999px; padding: 4px 12px;
+    font-size: 0.72rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;
+  }
+  .mcard.potato .mbadge { background: #fff3e8; color: #c2440f; }
+  .mcard.tomato .mbadge { background: #e8f5ee; color: var(--g2); }
+  .mcard h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--g1); margin: 0 0 10px; }
+  .mcard p  { font-size: 0.83rem; color: #6b7280; line-height: 1.6; margin: 0 0 14px; }
+  .stat-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stag {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 0.72rem; color: #374151;
+  }
+  .stag strong { color: var(--g2); font-weight: 600; }
+
+  /* Disease tags */
+  .disease-group { margin-bottom: 18px; }
+  .dg-title {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: white; border-radius: 999px; padding: 5px 14px;
+    font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
+  }
+  .dg-title.pt { background: linear-gradient(135deg, #e76f51, #f4a261); }
+  .dg-title.tm { background: linear-gradient(135deg, var(--g2), var(--g3)); }
+  .dtags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .dtag {
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 500; border: 1.5px solid;
+  }
+  .dtag.pt { background: #fff3e8; border-color: #f4a261; color: #c2440f; }
+  .dtag.tm { background: #e8f5ee; border-color: var(--g4); color: var(--g2); }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .srow {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 14px; padding: 16px 18px; transition: border-color 0.2s;
+  }
+  .srow:hover { border-color: var(--g4); }
+  .snum {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--g3), var(--g2));
+    color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .srow .st { font-weight: 600; font-size: 0.9rem; color: var(--g1); margin-bottom: 2px; }
+  .srow .sd { font-size: 0.8rem; color: #6b7280; }
+
+  /* Future */
+  .future-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 12px;
+  }
+  .fucard {
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 14px; padding: 18px 16px; transition: all 0.2s;
+  }
+  .fucard:hover { border-color: var(--g4); box-shadow: 0 4px 16px rgba(45,106,79,0.08); }
+  .fucard .fn { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--g4); line-height: 1; margin-bottom: 8px; }
+  .fucard .fx { font-size: 0.82rem; color: #374151; line-height: 1.5; }
+
+  @media (max-width: 640px) {
+    .model-grid { grid-template-columns: 1fr; }
+    .about-hero { padding: 36px 24px; }
+  }
+</style>
+
+<div class="about-wrap">
+
+  <!-- Hero -->
+  <div class="about-hero">
+    <div class="hero-tag">🌿 About the Project</div>
+    <h1>Crop Disease <span>Detection</span> System</h1>
+    <p>
+      A deep learning powered web application that identifies diseases in potato and tomato
+      leaf images — giving farmers and researchers instant diagnosis, confidence scores,
+      treatment advice, and downloadable PDF reports. &nbsp;फसल रोग पहचान AI प्रणाली।
+    </p>
+  </div>
+
+  <!-- Features -->
+  <div class="sec-title"><div class="ibox">⚡</div> Features</div>
+  <div class="feature-grid">
+    <div class="fcard"><div class="fi">📷</div><div class="ft">Camera Capture</div><div class="fd">Take leaf photos directly from your device camera without saving a file first.</div></div>
+    <div class="fcard"><div class="fi">🤖</div><div class="ft">AI Prediction</div><div class="fd">Custom CNN models predict the disease class with a confidence score for each image.</div></div>
+    <div class="fcard"><div class="fi">📋</div><div class="ft">PDF Report</div><div class="fd">Download a full diagnosis report with disease description and treatment plan.</div></div>
+    <div class="fcard"><div class="fi">📊</div><div class="ft">Live Dashboard</div><div class="fd">Separate dashboards for Potato, Tomato, and Overall — auto-refreshed every 4 seconds.</div></div>
+    <div class="fcard"><div class="fi">🕐</div><div class="ft">Test History</div><div class="fd">Every prediction stored with timestamp, confidence score, and crop type.</div></div>
+    <div class="fcard"><div class="fi">💊</div><div class="ft">Treatment Info</div><div class="fd">Bilingual (English + Hindi) disease description and treatment for every class.</div></div>
+  </div>
+
+  <!-- Models -->
+  <div class="sec-title"><div class="ibox">🧠</div> AI Models Used</div>
+  <div class="model-grid">
+    <div class="mcard potato">
+      <div class="mbadge">🥔 Potato</div>
+      <h4>Custom CNN — Potato Model</h4>
+      <p>Custom Convolutional Neural Network trained from scratch on the PlantVillage potato dataset with baked-in preprocessing.</p>
+      <div class="stat-row">
+        <div class="stag"><strong>Architecture:</strong> Custom CNN</div>
+        <div class="stag"><strong>Input:</strong> 256 × 256 px</div>
+        <div class="stag"><strong>Classes:</strong> 3</div>
+        <div class="stag"><strong>Layers:</strong> 4× Conv + GAP + Dense</div>
+        <div class="stag"><strong>Rescaling:</strong> Baked 1/255</div>
+      </div>
+    </div>
+    <div class="mcard tomato">
+      <div class="mbadge">🍅 Tomato</div>
+      <h4>Custom CNN — Tomato Model V2</h4>
+      <p>Same custom CNN architecture trained on the PlantVillage tomato dataset. Identifies 10 disease classes including viral and fungal conditions.</p>
+      <div class="stat-row">
+        <div class="stag"><strong>Architecture:</strong> Custom CNN</div>
+        <div class="stag"><strong>Input:</strong> 256 × 256 px</div>
+        <div class="stag"><strong>Classes:</strong> 10</div>
+        <div class="stag"><strong>Layers:</strong> 4× Conv + GAP + Dense</div>
+        <div class="stag"><strong>Rescaling:</strong> Baked 1/255</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disease Classes -->
+  <div class="sec-title"><div class="ibox">🦠</div> Supported Disease Classes</div>
+  <div class="disease-group">
+    <div class="dg-title pt">🥔 Potato — 3 Classes</div>
+    <div class="dtags">
+      <span class="dtag pt">Early Blight</span>
+      <span class="dtag pt">Late Blight</span>
+      <span class="dtag pt">Healthy</span>
+    </div>
+  </div>
+  <div class="disease-group">
+    <div class="dg-title tm">🍅 Tomato — 10 Classes</div>
+    <div class="dtags">
+      <span class="dtag tm">Bacterial Spot</span>
+      <span class="dtag tm">Early Blight</span>
+      <span class="dtag tm">Late Blight</span>
+      <span class="dtag tm">Leaf Mold</span>
+      <span class="dtag tm">Septoria Leaf Spot</span>
+      <span class="dtag tm">Spider Mites</span>
+      <span class="dtag tm">Target Spot</span>
+      <span class="dtag tm">Yellow Leaf Curl Virus</span>
+      <span class="dtag tm">Tomato Mosaic Virus</span>
+      <span class="dtag tm">Healthy</span>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="sec-title"><div class="ibox">⚙️</div> How It Works</div>
+  <div class="steps">
+    <div class="srow"><div class="snum">1</div><div><div class="st">Select Crop Type</div><div class="sd">Choose Potato or Tomato — this loads the correct trained model.</div></div></div>
+    <div class="srow"><div class="snum">2</div><div><div class="st">Upload or Capture Leaf Image</div><div class="sd">Upload a saved photo or use the live camera to capture the leaf directly from your device.</div></div></div>
+    <div class="srow"><div class="snum">3</div><div><div class="st">Image Preprocessing</div><div class="sd">Image is resized to 256×256 px and passed as raw pixels — the model's baked Rescaling(1/255) layer normalises internally.</div></div></div>
+    <div class="srow"><div class="snum">4</div><div><div class="st">CNN Inference</div><div class="sd">Forward pass through 4 Conv layers → Global Average Pooling → Dense layers → Softmax probabilities across all classes.</div></div></div>
+    <div class="srow"><div class="snum">5</div><div><div class="st">Result + Treatment</div><div class="sd">Top predicted class, confidence score, bilingual disease description, and treatment advice shown on the result page.</div></div></div>
+    <div class="srow"><div class="snum">6</div><div><div class="st">Stored & Tracked</div><div class="sd">Every test saved to the database — reflected instantly on the live dashboard and history page.</div></div></div>
+  </div>
+
+  <!-- Future -->
+  <div class="sec-title"><div class="ibox">🚀</div> Future Improvements</div>
+  <div class="future-grid">
+    <div class="fucard"><div class="fn">01</div><div class="fx">Add more crops — Corn, Pepper, Rice, Wheat</div></div>
+    <div class="fucard"><div class="fn">02</div><div class="fx">Grad-CAM heatmaps to highlight the diseased leaf area</div></div>
+    <div class="fucard"><div class="fn">03</div><div class="fx">Mobile app for offline field use by farmers</div></div>
+    <div class="fucard"><div class="fn">04</div><div class="fx">Auto crop detection — no manual selection needed</div></div>
+    <div class="fucard"><div class="fn">05</div><div class="fx">Real-time monitoring via drone or IoT field cameras</div></div>
+    <div class="fucard"><div class="fn">06</div><div class="fx">Weather-based disease risk forecasting system</div></div>
+  </div>
+
+</div>
+{% endblock %}

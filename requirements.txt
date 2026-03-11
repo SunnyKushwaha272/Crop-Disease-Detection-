@@ -1,0 +1,23 @@
+# ── Web Framework 
+flask
+werkzeug
+
+# ── Deep Learning & Model 
+tensorflow
+keras
+
+# ── Image Processing 
+pillow
+numpy
+
+# ── PDF Report Generation 
+reportlab
+
+# ── Database ─
+# sqlite3 is built into Python — no install needed
+
+# ── Dev / Utilities ─
+python-dotenv
+
+# --
+gunicorn

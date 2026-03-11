@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --g1: #0a2e1a; --g2: #1a5c35; --g3: #2d8a54;
+    --g4: #52b788; --g5: #b7e4c7;
+  }
+
+  .result-wrap {
+    font-family: 'DM Sans', sans-serif;
+    max-width: 1000px; margin: 0 auto; padding: 36px 24px 60px;
+  }
+
+  /* ── Page header ── */
+  .result-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px;
+  }
+  .result-header h2 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.6rem; color: var(--g1); margin: 0;
+  }
+  .result-header p { color: #6b7280; font-size: 0.87rem; margin: 0; }
+
+  /* ── Main grid ── */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ── Image card ── */
+  .img-card {
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 20px; overflow: hidden;
+    position: sticky; top: 76px;
+  }
+  .img-card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #f3f4f6;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.85rem; color: var(--g1);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .img-card img {
+    width: 100%; display: block;
+    max-height: 340px; object-fit: cover;
+  }
+  .img-card-footer {
+    padding: 12px 18px;
+    background: #fafafa; border-top: 1px solid #f3f4f6;
+    font-size: 0.75rem; color: #9ca3af;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── Result card ── */
+  .result-card {
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 20px; overflow: hidden;
+  }
+
+  /* Top strip — green for healthy, red for disease */
+  .result-strip {
+    height: 5px;
+    background: linear-gradient(90deg, var(--g2), var(--g4));
+  }
+  .result-strip.disease {
+    background: linear-gradient(90deg, #e53935, #f4a261);
+  }
+
+  .result-card-body { padding: 24px; }
+
+  /* Crop badge */
+  .crop-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+  .crop-badge.potato { background: #fff3e8; color: #c2440f; border: 1px solid #f4a261; }
+  .crop-badge.tomato { background: #e8f5ee; color: var(--g2); border: 1px solid var(--g4); }
+
+  /* Disease name */
+  .disease-name {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: var(--g1); margin: 0 0 6px;
+    line-height: 1.15;
+  }
+  .disease-hindi { color: #9ca3af; font-size: 0.82rem; font-style: italic; margin-bottom: 20px; }
+
+  /* Confidence */
+  .conf-section { margin-bottom: 24px; }
+  .conf-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .conf-label { font-size: 0.78rem; color: #6b7280; font-weight: 500; }
+  .conf-value {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.1rem;
+  }
+  .conf-value.high   { color: var(--g2); }
+  .conf-value.medium { color: #d97706; }
+  .conf-value.low    { color: #dc2626; }
+
+  .conf-track {
+    height: 10px; border-radius: 999px;
+    background: #f0f0f0; overflow: hidden;
+  }
+  .conf-fill {
+    height: 100%; border-radius: 999px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+  .conf-fill.high   { background: linear-gradient(90deg, var(--g2), var(--g4)); }
+  .conf-fill.medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .conf-fill.low    { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+  /* Divider */
+  .divider { height: 1px; background: #f0f0f0; margin: 20px 0; }
+
+  /* Info sections */
+  .info-section { margin-bottom: 20px; }
+  .info-section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.82rem; color: var(--g2);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .info-section-body {
+    background: #fafafa; border: 1px solid #f0f0f0;
+    border-radius: 12px; padding: 14px 16px;
+    font-size: 0.88rem; color: #374151; line-height: 1.7;
+  }
+
+  /* Actual label badge */
+  .actual-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 600; margin-bottom: 20px;
+  }
+  .actual-badge.correct   { background: #e8f5ee; color: var(--g2); border: 1px solid var(--g4); }
+  .actual-badge.incorrect { background: #fef2f2; color: #b91c1c;  border: 1px solid #fecaca; }
+  .actual-badge.unknown   { background: #f3f4f6; color: #6b7280;  border: 1px solid #e5e7eb; }
+
+  /* Action buttons */
+  .action-row {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px;
+  }
+  .act-btn {
+    flex: 1; min-width: 120px;
+    padding: 12px 16px; border-radius: 12px;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.85rem; text-align: center;
+    text-decoration: none; cursor: pointer;
+    border: none; transition: all 0.22s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .act-btn-primary {
+    background: linear-gradient(135deg, var(--g2), var(--g1));
+    color: white;
+  }
+  .act-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,92,53,0.3); color: white; }
+
+  .act-btn-outline {
+    background: white; color: var(--g2);
+    border: 1.5px solid var(--g4);
+  }
+  .act-btn-outline:hover { background: var(--g2); color: white; border-color: var(--g2); }
+
+  .act-btn-ghost {
+    background: #f3f4f6; color: #374151;
+    border: 1.5px solid #e5e7eb;
+  }
+  .act-btn-ghost:hover { background: #e5e7eb; }
+
+  @media (max-width: 768px) {
+    .result-grid { grid-template-columns: 1fr; }
+    .img-card    { position: static; }
+  }
+</style>
+
+<div class="result-wrap">
+
+  <!-- Header -->
+  <div class="result-header">
+    <div>
+      <h2>🔬 Analysis Result</h2>
+      <p>विश्लेषण परिणाम — AI disease prediction complete</p>
+    </div>
+  </div>
+
+  <div class="result-grid">
+
+    <!-- LEFT — Leaf image -->
+    <div class="img-card">
+      <div class="img-card-header">
+        🌿 Uploaded Leaf Image
+      </div>
+      <img src="{{ image }}" alt="Leaf Image">
+      <div class="img-card-footer">
+        📷 Analyzed by AI model &nbsp;·&nbsp; पत्ती का विश्लेषण किया गया
+      </div>
+    </div>
+
+    <!-- RIGHT — Result -->
+    <div class="result-card">
+
+      {% set is_healthy = 'healthy' in prediction|lower %}
+      <div class="result-strip {% if not is_healthy %}disease{% endif %}"></div>
+
+      <div class="result-card-body">
+
+        <!-- Crop badge -->
+        {% if crop_type %}
+        <div class="crop-badge {{ crop_type|lower }}">
+          {% if crop_type|lower == 'potato' %}🥔{% else %}🍅{% endif %}
+          {{ crop_type|capitalize }}
+        </div>
+        {% endif %}
+
+        <!-- Disease name -->
+        <div class="disease-name">{{ prediction }}</div>
+        <div class="disease-hindi">रोग की पहचान</div>
+
+        <!-- Confidence bar -->
+        {% set conf_class = 'high' if confidence > 80 else ('medium' if confidence > 60 else 'low') %}
+        <div class="conf-section">
+          <div class="conf-header">
+            <span class="conf-label">Confidence Score (विश्वास स्तर)</span>
+            <span class="conf-value {{ conf_class }}">{{ confidence }}%</span>
+          </div>
+          <div class="conf-track">
+            <div class="conf-fill {{ conf_class }}" style="width: {{ confidence }}%"></div>
+          </div>
+        </div>
+
+        <!-- Actual label if provided -->
+        {% if actual and actual != 'Not Provided' %}
+          {% set is_correct = actual|lower == prediction|lower %}
+          <div class="actual-badge {% if is_correct %}correct{% else %}incorrect{% endif %}">
+            {% if is_correct %}✅ Correct prediction{% else %}❌ Actual: {{ actual }}{% endif %}
+          </div>
+        {% endif %}
+
+        <div class="divider"></div>
+
+        <!-- Description -->
+        {% if description %}
+        <div class="info-section">
+          <div class="info-section-title">📋 Disease Description (रोग का विवरण)</div>
+          <div class="info-section-body">{{ description }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Treatment -->
+        {% if treatment %}
+        <div class="info-section">
+          <div class="info-section-title">💊 Recommended Treatment (उपचार)</div>
+          <div class="info-section-body">{{ treatment }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="action-row">
+          <a class="act-btn act-btn-primary" href="{{ url_for('index') }}">
+            🔍 Analyze Another
+          </a>
+          <a class="act-btn act-btn-outline" href="{{ url_for('dashboard') }}">
+            📊 Dashboard
+          </a>
+          <a class="act-btn act-btn-ghost" href="{{ url_for('history') }}">
+            🕐 History
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- ── Tab Navigation ─────────────────────────────────────────────────── -->
+<ul class="nav nav-tabs mb-4" id="dashTabs">
+  <li class="nav-item">
+    <button class="nav-link active" data-tab="overall">📊 Overall</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-tab="potato">🥔 Potato</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-tab="tomato">🍅 Tomato</button>
+  </li>
+</ul>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     OVERALL TAB
+════════════════════════════════════════════════════════════════════ -->
+<div id="tab-overall" class="dash-tab">
+  <div class="row">
+    <div class="col-md-8">
+
+      <!-- Stat cards -->
+      <div class="row mb-3">
+        <div class="col-6 col-md-3 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-success" id="ov-total">{{ stats.total }}</div>
+            <div class="text-muted small">Total Tests</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-primary" id="ov-conf">
+              {% if stats.avg_confidence %}{{ stats.avg_confidence }}%{% else %}N/A{% endif %}
+            </div>
+            <div class="text-muted small">Avg Confidence</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-warning" id="ov-potato">{{ stats.potato_tests }}</div>
+            <div class="text-muted small">Potato Tests</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-danger" id="ov-tomato">{{ stats.tomato_tests }}</div>
+            <div class="text-muted small">Tomato Tests</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card p-3 shadow-sm mb-3">
+        <h5>All Predictions Distribution</h5>
+        <canvas id="ov-chart" height="120"></canvas>
+      </div>
+
+      <!-- Table -->
+      <div class="card p-3 shadow-sm">
+        <h5>Predictions per Class</h5>
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-dark">
+            <tr><th>Disease Class</th><th>Predictions</th></tr>
+          </thead>
+          <tbody id="ov-table">
+            {% for c in class_names %}
+            <tr>
+              <td>{{ stats.per_class[c].clean_name }}</td>
+              <td>{{ stats.per_class[c].predicted_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+      <div class="card p-3 shadow-sm mb-3">
+        <h5>Quick Actions</h5>
+        <a class="btn btn-success w-100 mb-2" href="{{ url_for('index') }}">🔍 Analyze New Leaf</a>
+        <a class="btn btn-outline-secondary w-100" href="{{ url_for('history') }}">📋 View History</a>
+      </div>
+      <div class="card p-3 shadow-sm">
+        <h5>Accuracy</h5>
+        <div class="fs-1 fw-bold text-center text-success" id="ov-acc">
+          {% if stats.accuracy %}{{ stats.accuracy }}%{% else %}N/A{% endif %}
+        </div>
+        <div class="text-muted text-center small">Based on labelled tests</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     POTATO TAB
+════════════════════════════════════════════════════════════════════ -->
+<div id="tab-potato" class="dash-tab" style="display:none">
+  <div class="row">
+    <div class="col-md-8">
+
+      <div class="row mb-3">
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-warning" id="pt-total">{{ stats.potato_tests }}</div>
+            <div class="text-muted small">Total Potato Tests</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-primary" id="pt-conf">N/A</div>
+            <div class="text-muted small">Avg Confidence</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-success" id="pt-acc">N/A</div>
+            <div class="text-muted small">Accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-3 shadow-sm mb-3">
+        <h5>🥔 Potato Disease Distribution</h5>
+        <canvas id="pt-chart" height="160"></canvas>
+      </div>
+
+      <div class="card p-3 shadow-sm">
+        <h5>Potato Predictions per Class</h5>
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-warning">
+            <tr><th>Disease Class</th><th>Predictions</th></tr>
+          </thead>
+          <tbody id="pt-table">
+            <tr><td colspan="2" class="text-center text-muted">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3 shadow-sm">
+        <h5>Quick Actions</h5>
+        <a class="btn btn-success w-100 mb-2" href="{{ url_for('index') }}">🔍 Analyze Potato Leaf</a>
+        <a class="btn btn-outline-secondary w-100" href="{{ url_for('history') }}">📋 View History</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     TOMATO TAB
+════════════════════════════════════════════════════════════════════ -->
+<div id="tab-tomato" class="dash-tab" style="display:none">
+  <div class="row">
+    <div class="col-md-8">
+
+      <div class="row mb-3">
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-danger" id="tm-total">{{ stats.tomato_tests }}</div>
+            <div class="text-muted small">Total Tomato Tests</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-primary" id="tm-conf">N/A</div>
+            <div class="text-muted small">Avg Confidence</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-2">
+          <div class="card text-center p-3 shadow-sm h-100">
+            <div class="fs-2 fw-bold text-success" id="tm-acc">N/A</div>
+            <div class="text-muted small">Accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-3 shadow-sm mb-3">
+        <h5>🍅 Tomato Disease Distribution</h5>
+        <canvas id="tm-chart" height="120"></canvas>
+      </div>
+
+      <div class="card p-3 shadow-sm">
+        <h5>Tomato Predictions per Class</h5>
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-danger">
+            <tr><th>Disease Class</th><th>Predictions</th></tr>
+          </thead>
+          <tbody id="tm-table">
+            <tr><td colspan="2" class="text-center text-muted">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3 shadow-sm">
+        <h5>Quick Actions</h5>
+        <a class="btn btn-success w-100 mb-2" href="{{ url_for('index') }}">🔍 Analyze Tomato Leaf</a>
+        <a class="btn btn-outline-secondary w-100" href="{{ url_for('history') }}">📋 View History</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script>
+
+// ── Tab switching ────────────────────────────────────────────────────────
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.dash-tab').forEach(t => t.style.display = 'none');
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+  });
+});
+
+
+// ── Chart helpers ────────────────────────────────────────────────────────
+function cleanLabel(s) {
+  return s.replace(/Potato___/g,'').replace(/Tomato__/g,'').replace(/Tomato_/g,'').replace(/_/g,' ');
+}
+
+function makeBar(id, color) {
+  return new Chart(document.getElementById(id).getContext('2d'), {
+    type: 'bar',
+    data: { labels: [], datasets: [{ label: 'Predictions', data: [], backgroundColor: color }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+}
+
+// Overall chart — seeded from server-side Jinja on first load
+const ovChart = new Chart(document.getElementById('ov-chart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: {{ class_names | tojson }}.map(cleanLabel),
+    datasets: [{ label: 'Predictions', data: {{ predicted_counts | tojson }}, backgroundColor: '#4CAF50' }]
+  },
+  options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+
+const ptChart = makeBar('pt-chart', '#FFC107');
+
+// Tomato uses doughnut for variety
+const tmChart = new Chart(document.getElementById('tm-chart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: [],
+    datasets: [{ data: [], backgroundColor: [
+      '#e53935','#fb8c00','#43a047','#00897b',
+      '#1e88e5','#8e24aa','#f4511e','#6d4c41','#546e7a','#00acc1'
+    ]}]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'right' } } }
+});
+
+
+// ── Live refresh ──────────────────────────────────────────────────────────
+async function refresh() {
+  try {
+    const res  = await fetch('/api/dashboard-stats');
+    const d    = await res.json();
+
+    // ── Overall ──────────────────────────────────────────────────────────
+    document.getElementById('ov-total').textContent  = d.total;
+    document.getElementById('ov-conf').textContent   = d.avg_confidence  ? d.avg_confidence  + '%' : 'N/A';
+    document.getElementById('ov-potato').textContent = d.potato_tests;
+    document.getElementById('ov-tomato').textContent = d.tomato_tests;
+    document.getElementById('ov-acc').textContent    = d.accuracy        ? d.accuracy        + '%' : 'N/A';
+
+    ovChart.data.labels           = d.class_names;
+    ovChart.data.datasets[0].data = d.predicted_counts;
+    ovChart.update();
+
+    document.getElementById('ov-table').innerHTML = d.class_names
+      .map((n,i) => `<tr><td>${n}</td><td>${d.predicted_counts[i]}</td></tr>`).join('');
+
+    // ── Potato ───────────────────────────────────────────────────────────
+    document.getElementById('pt-total').textContent = d.potato_tests;
+    document.getElementById('pt-conf').textContent  = d.potato_avg_confidence ? d.potato_avg_confidence + '%' : 'N/A';
+    document.getElementById('pt-acc').textContent   = d.potato_accuracy       ? d.potato_accuracy       + '%' : 'N/A';
+
+    ptChart.data.labels           = d.potato_class_names;
+    ptChart.data.datasets[0].data = d.potato_counts;
+    ptChart.update();
+
+    document.getElementById('pt-table').innerHTML = d.potato_class_names.length
+      ? d.potato_class_names.map((n,i) => `<tr><td>${n}</td><td>${d.potato_counts[i]}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="text-center text-muted">No potato tests yet</td></tr>';
+
+    // ── Tomato ───────────────────────────────────────────────────────────
+    document.getElementById('tm-total').textContent = d.tomato_tests;
+    document.getElementById('tm-conf').textContent  = d.tomato_avg_confidence ? d.tomato_avg_confidence + '%' : 'N/A';
+    document.getElementById('tm-acc').textContent   = d.tomato_accuracy       ? d.tomato_accuracy       + '%' : 'N/A';
+
+    tmChart.data.labels           = d.tomato_class_names;
+    tmChart.data.datasets[0].data = d.tomato_counts;
+    tmChart.update();
+
+    document.getElementById('tm-table').innerHTML = d.tomato_class_names.length
+      ? d.tomato_class_names.map((n,i) => `<tr><td>${n}</td><td>${d.tomato_counts[i]}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="text-center text-muted">No tomato tests yet</td></tr>';
+
+  } catch(e) {
+    console.warn('Dashboard refresh failed:', e);
+  }
+}
+
+refresh();                    // immediately on page load
+setInterval(refresh, 4000);  // then every 4 seconds
+
+</script>
+
+{% endblock %}

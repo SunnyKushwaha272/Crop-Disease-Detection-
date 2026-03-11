@@ -1,0 +1,559 @@
+{% extends "base.html" %} {% block content %}
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap");
+
+  :root {
+    --g1: #0a2e1a;
+    --g2: #1a5c35;
+    --g3: #2d8a54;
+    --g4: #52b788;
+    --g5: #b7e4c7;
+  }
+
+  .hist-wrap {
+    font-family: "DM Sans", sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+  }
+
+  /* ── Page header ── */
+  .hist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .hist-header-left h2 {
+    font-family: "Syne", sans-serif;
+    font-weight: 800;
+    font-size: 1.7rem;
+    color: var(--g1);
+    margin: 0 0 4px;
+  }
+  .hist-header-left p {
+    color: #6b7280;
+    font-size: 0.87rem;
+    margin: 0;
+  }
+
+  .hist-header-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Filter pills */
+  .filter-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .fpill {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid #e5e7eb;
+    background: white;
+    color: #374151;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .fpill:hover {
+    border-color: var(--g4);
+    color: var(--g2);
+  }
+  .fpill.active {
+    background: var(--g2);
+    border-color: var(--g2);
+    color: white;
+  }
+
+  /* Search box */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus {
+    border-color: var(--g4);
+  }
+  .search-wrap .sicon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.95rem;
+  }
+
+  /* ── Cards grid ── */
+  .hist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .hist-card {
+    background: white;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.22s;
+    display: flex;
+    flex-direction: column;
+  }
+  .hist-card:hover {
+    border-color: var(--g4);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(45, 106, 79, 0.12);
+  }
+
+  /* Card top strip by crop */
+  .hist-card.potato {
+    border-top: 3px solid #f4a261;
+  }
+  .hist-card.tomato {
+    border-top: 3px solid var(--g4);
+  }
+
+  /* Image area */
+  .card-img-wrap {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: #f3f4f6;
+  }
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .hist-card:hover .card-img-wrap img {
+    transform: scale(1.05);
+  }
+
+  .card-crop-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+  }
+  .card-crop-badge.potato {
+    background: rgba(244, 162, 97, 0.9);
+    color: white;
+  }
+  .card-crop-badge.tomato {
+    background: rgba(45, 138, 84, 0.9);
+    color: white;
+  }
+
+  .card-id-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.45);
+    color: white;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Card body */
+  .card-body-inner {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-disease {
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: var(--g1);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .conf-bar-wrap {
+    flex: 1;
+    margin-right: 10px;
+  }
+  .conf-label {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-bottom: 3px;
+  }
+  .conf-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+  }
+  .conf-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  .conf-fill.high {
+    background: linear-gradient(90deg, var(--g3), var(--g4));
+  }
+  .conf-fill.medium {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+  .conf-fill.low {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  .conf-pct {
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+  .conf-pct.high {
+    color: var(--g2);
+  }
+  .conf-pct.medium {
+    color: #d97706;
+  }
+  .conf-pct.low {
+    color: #dc2626;
+  }
+
+  .card-time {
+    font-size: 0.72rem;
+    color: #9ca3af;
+  }
+
+  /* Card footer */
+  .card-footer-inner {
+    padding: 10px 16px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .view-btn {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--g2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dl-btn {
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--g4);
+    color: var(--g2);
+    background: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+    font-family: "DM Sans", sans-serif;
+  }
+  .dl-btn:hover {
+    background: var(--g2);
+    color: white;
+    border-color: var(--g2);
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #9ca3af;
+  }
+  .empty-state .eicon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+  }
+  .empty-state h4 {
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 0.88rem;
+    margin-bottom: 20px;
+  }
+  .empty-state a {
+    display: inline-block;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--g2), var(--g1));
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+  }
+  .empty-state a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(26, 92, 53, 0.3);
+  }
+
+  /* Count badge */
+  .count-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0faf5;
+    border: 1px solid var(--g5);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--g2);
+  }
+
+  /* hidden for filter */
+  .hist-card.hidden {
+    display: none;
+  }
+</style>
+
+<div class="hist-wrap">
+  <!-- Header -->
+  <div class="hist-header">
+    <div class="hist-header-left">
+      <h2>🕐 Prediction History</h2>
+      <p>All analyzed leaf images with disease predictions</p>
+    </div>
+    <div class="hist-header-right">
+      <span class="count-chip">
+        🧪 <span id="visibleCount">{{ tests|length }}</span> of {{ tests|length
+        }} tests
+      </span>
+      <a
+        href="{{ url_for('index') }}"
+        style="
+          padding: 8px 18px;
+          background: linear-gradient(135deg, var(--g2), var(--g1));
+          color: white;
+          border-radius: 10px;
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 600;
+        "
+      >
+        + New Analysis
+      </a>
+    </div>
+  </div>
+
+  {% if tests %}
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="sicon">🔍</span>
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search by disease, crop type…"
+      oninput="filterCards()"
+    />
+  </div>
+
+  <!-- Filter pills -->
+  <div class="filter-pills">
+    <div
+      class="fpill active"
+      data-filter="all"
+      onclick="setFilter('all', this)"
+    >
+      All
+    </div>
+    <div class="fpill" data-filter="potato" onclick="setFilter('potato', this)">
+      🥔 Potato
+    </div>
+    <div class="fpill" data-filter="tomato" onclick="setFilter('tomato', this)">
+      🍅 Tomato
+    </div>
+    <div class="fpill" data-filter="high" onclick="setFilter('high', this)">
+      ✅ High Confidence
+    </div>
+    <div class="fpill" data-filter="low" onclick="setFilter('low', this)">
+      ⚠️ Low Confidence
+    </div>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="hist-grid" id="histGrid">
+    {% for t in tests %} {% set conf_pct = (t.confidence * 100)|round(1) %} {%
+    set conf_class = 'high' if t.confidence > 0.8 else ('medium' if t.confidence
+    > 0.6 else 'low') %} {% set crop = t.crop_type|lower if t.crop_type else
+    'unknown' %} {% set disease =
+    t.predicted.replace('Potato___','').replace('Tomato__','').replace('Tomato_','').replace('_','
+    ') %}
+
+    <div
+      class="hist-card {{ crop }}"
+      data-crop="{{ crop }}"
+      data-conf="{{ t.confidence }}"
+      data-disease="{{ disease|lower }}"
+      onclick="window.location='/test/{{ t.id }}'"
+    >
+      <!-- Image -->
+      <div class="card-img-wrap">
+        <img
+          src="{{ url_for('static', filename='uploads/' + t.filename) }}"
+          alt="{{ disease }}"
+          loading="lazy"
+        />
+        <span class="card-crop-badge {{ crop }}">
+          {% if crop == 'potato' %}🥔{% else %}🍅{% endif %} {{ crop|capitalize
+          }}
+        </span>
+        <span class="card-id-badge">#{{ t.id }}</span>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body-inner">
+        <div class="card-disease">{{ disease }}</div>
+
+        <div class="card-meta">
+          <div class="conf-bar-wrap">
+            <div class="conf-label">Confidence</div>
+            <div class="conf-bar">
+              <div
+                class="conf-fill {{ conf_class }}"
+                style="width: {{ conf_pct }}%"
+              ></div>
+            </div>
+          </div>
+          <span class="conf-pct {{ conf_class }}">{{ conf_pct }}%</span>
+        </div>
+
+        <div class="card-time">🕐 {{ t.timestamp[:19]|replace('T',' ') }}</div>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer-inner">
+        <span class="view-btn">View Details →</span>
+        <a
+          class="dl-btn"
+          href="{{ url_for('download_report', test_id=t.id) }}"
+          onclick="event.stopPropagation()"
+        >
+          📄 PDF
+        </a>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  <!-- No results after filter -->
+  <div
+    id="noResults"
+    style="
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    "
+  >
+    No tests match your filter.
+    <span
+      style="cursor: pointer; color: var(--g2); font-weight: 600"
+      onclick="setFilter('all', document.querySelector('[data-filter=all]'))"
+      >Clear filter</span
+    >
+  </div>
+
+  {% else %}
+
+  <div class="empty-state">
+    <div class="eicon">🌿</div>
+    <h4>No predictions yet</h4>
+    <p>Upload a leaf image to start detecting crop diseases.</p>
+    <a href="{{ url_for('index') }}">Analyze First Leaf</a>
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+  let activeFilter = "all";
+
+  function setFilter(f, el) {
+    activeFilter = f;
+    document
+      .querySelectorAll(".fpill")
+      .forEach((p) => p.classList.remove("active"));
+    el.classList.add("active");
+    filterCards();
+  }
+
+  function filterCards() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    const cards = document.querySelectorAll(".hist-card");
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const crop = card.dataset.crop;
+      const conf = parseFloat(card.dataset.conf);
+      const disease = card.dataset.disease;
+
+      const matchFilter =
+        activeFilter === "all"
+          ? true
+          : activeFilter === "potato"
+            ? crop === "potato"
+            : activeFilter === "tomato"
+              ? crop === "tomato"
+              : activeFilter === "high"
+                ? conf > 0.8
+                : activeFilter === "low"
+                  ? conf <= 0.6
+                  : true;
+
+      const matchSearch = q === "" || disease.includes(q) || crop.includes(q);
+
+      const show = matchFilter && matchSearch;
+      card.classList.toggle("hidden", !show);
+      if (show) visible++;
+    });
+
+    document.getElementById("visibleCount").textContent = visible;
+    document.getElementById("noResults").style.display =
+      visible === 0 ? "block" : "none";
+  }
+</script>
+
+{% endblock %}

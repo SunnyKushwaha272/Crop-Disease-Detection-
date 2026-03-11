@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+  <div class="card-body">
+
+    <h3>Test Result</h3>
+
+    <p><b>Test ID:</b> {{ test.id }}</p>
+    <p><b>Timestamp:</b> {{ test.timestamp }}</p>
+    <p><b>Crop:</b> {{ test.crop_type|capitalize }}</p>
+    <p><b>File:</b> {{ test.filename }}</p>
+
+    <hr>
+
+    <h5>Uploaded Image</h5>
+
+    <img src="{{ url_for('static', filename='uploads/' ~ test.filename) }}"
+         style="max-width:400px"
+         class="img-fluid rounded">
+
+    <hr>
+
+    <h5>Prediction</h5>
+
+    <p>
+      <b>Disease:</b>
+      {{ test.predicted
+          .replace('Potato___','')
+          .replace('Tomato_','')
+          .replace('_',' ') }}
+    </p>
+
+    <p>
+      <b>Confidence:</b>
+      {{ (test.confidence * 100)|round(2) }} %
+    </p>
+
+    <!-- Confidence Bar -->
+    <div class="progress mb-3">
+      <div class="progress-bar bg-success"
+           role="progressbar"
+           style="width: {{ (test.confidence * 100)|round(2) }}%">
+        {{ (test.confidence * 100)|round(2) }}%
+      </div>
+    </div>
+
+    <hr>
+
+    <h5>About this Disease</h5>
+    <p>
+      {{ description }}
+    </p>
+
+    <h5>Treatment</h5>
+    <p>
+      {{ treatment }}
+    </p>
+
+    <hr>
+
+    <a href="{{ url_for('download_report', test_id=test.id) }}"
+       class="btn btn-success">
+       Download Report PDF
+    </a>
+
+    <a href="{{ url_for('history') }}"
+       class="btn btn-secondary">
+       Back to History
+    </a>
+
+  </div>
+</div>
+
+{% endblock %}

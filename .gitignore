@@ -1,0 +1,23 @@
+# Database
+data/app.db
+
+# Dataset
+tomato_dataset_500_images/
+PlantVillage
+
+# Uploaded images
+static/uploads/
+
+# Python cache
+__pycache__/
+utils/__pycache__/
+
+# Jupyter checkpoints
+training/.ipynb_checkpoints/
+
+# Virtual environment
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
