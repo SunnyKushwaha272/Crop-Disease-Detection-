@@ -244,3 +244,6 @@ rm data/app.db         # macOS / Linux
 ## 📄 License
 
 This project is for educational and research purposes.
+
+## Project Link
+https://huggingface.co/spaces/Sunnykushwaha/crop-disease-ai
