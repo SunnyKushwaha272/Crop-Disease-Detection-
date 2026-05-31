@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .admin-login-wrap {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .admin-login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    text-align: center;
+  }
+  .admin-login-card .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .admin-login-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--g2);
+    margin-bottom: 0.25rem;
+  }
+  .admin-login-card p { color: #888; margin-bottom: 2rem; font-size: 0.95rem; }
+  .admin-login-card input[type="password"] {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+  }
+  .admin-login-card input[type="password"]:focus { border-color: var(--g3); }
+  .admin-login-card button {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--g2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .admin-login-card button:hover { background: var(--g1); }
+  .flash-error {
+    background: #fff0f0;
+    color: #c0392b;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="admin-login-wrap">
+  <div class="admin-login-card">
+    <div class="icon">🔐</div>
+    <h2>Admin Login</h2>
+    <p>Enter your admin password to continue</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="flash-error">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <input type="password" name="password" placeholder="Enter admin password" required autofocus>
+      <button type="submit">🔓 Login</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

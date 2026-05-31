@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .invalid-wrap {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .invalid-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    text-align: center;
+  }
+  .invalid-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+  .invalid-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #c0392b;
+    margin-bottom: 0.5rem;
+  }
+  .invalid-card .subtitle {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  .error-box {
+    background: #fff5f5;
+    border: 1.5px solid #fecaca;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    color: #b91c1c;
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    line-height: 1.6;
+  }
+
+  {% if image %}
+  .preview-img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #fecaca;
+  }
+  {% endif %}
+
+  .tips-box {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+  .tips-box h4 {
+    font-weight: 700;
+    color: var(--g2);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .tips-box ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: #555;
+    font-size: 0.88rem;
+    line-height: 1.8;
+  }
+  .btn-try-again {
+    display: inline-block;
+    background: var(--g2);
+    color: white;
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    width: 100%;
+  }
+  .btn-try-again:hover {
+    background: var(--g1);
+    color: white;
+  }
+</style>
+
+<div class="invalid-wrap">
+  <div class="invalid-card">
+
+    <div class="invalid-icon">🚫</div>
+    <h2>Invalid Image</h2>
+    <p class="subtitle">We could not analyze this image</p>
+
+    {% if image %}
+      <img src="{{ image }}" class="preview-img" alt="Uploaded image">
+    {% endif %}
+
+    <div class="error-box">
+      {{ error_message }}
+    </div>
+
+    <div class="tips-box">
+      <h4>✅ For best results, please upload:</h4>
+      <ul>
+        <li>A clear photo of a <strong>Potato leaf</strong> 🥔</li>
+        <li>A clear photo of a <strong>Tomato leaf</strong> 🍅</li>
+        <li>Image should show the <strong>leaf clearly</strong></li>
+        <li>Good lighting, no heavy blur or dark shadows</li>
+        <li>Formats: JPG, JPEG, PNG</li>
+      </ul>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="btn-try-again">
+      🔄 Try Again with a Different Image
+    </a>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,342 @@
+{% extends "base.html" %} {% block content %}
+
+<style>
+  .admin-wrap {
+    padding: 2rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .admin-header h1 {
+    font-family: "Syne", sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--g2);
+  }
+  .admin-header .actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover {
+    opacity: 0.85;
+  }
+  .btn-green {
+    background: var(--g2);
+    color: white;
+  }
+  .btn-red {
+    background: #e74c3c;
+    color: white;
+  }
+  .btn-export {
+    background: #27ae60;
+    color: white;
+  }
+
+  /* ── Stat cards — FIXED overflow ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem 0.75rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    overflow: hidden; /* ← prevent overflow */
+    min-width: 0; /* ← allow shrinking */
+  }
+  .stat-card .val {
+    font-family: "Syne", sans-serif;
+    font-size: 1.6rem; /* ← reduced from 2rem to prevent overflow */
+    font-weight: 800;
+    color: var(--g2);
+    white-space: nowrap; /* ← keep on one line */
+    overflow: hidden;
+    text-overflow: ellipsis; /* ← show ... if still too long */
+    display: block;
+  }
+  .stat-card .lbl {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.25rem;
+    line-height: 1.3;
+  }
+
+  /* ── Table ── */
+  .table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+  }
+  .table-card-header {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .table-card-header h3 {
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    color: var(--g2);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .search-input {
+    padding: 0.5rem 1rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    width: 220px;
+  }
+  .search-input:focus {
+    border-color: var(--g3);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th {
+    background: #f8f9fa;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    color: #555;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  td {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #f5f5f5;
+    vertical-align: middle;
+  }
+  tr:hover td {
+    background: #fafff8;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-potato {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .badge-tomato {
+    background: #fce4ec;
+    color: #c62828;
+  }
+  .badge-correct {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .badge-wrong {
+    background: #ffebee;
+    color: #c62828;
+  }
+  .badge-na {
+    background: #f5f5f5;
+    color: #999;
+  }
+
+  .conf-bar-wrap {
+    width: 60px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    height: 6px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .conf-bar {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--g3);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+  }
+
+  @media (max-width: 600px) {
+    .stat-card .val {
+      font-size: 1.3rem;
+    }
+    .search-input {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="admin-wrap">
+  <!-- Header -->
+  <div class="admin-header">
+    <h1>🛡️ Admin Panel</h1>
+    <div class="actions">
+      <a
+        href="{{ url_for('admin_export_csv', token=token) }}"
+        class="btn btn-export"
+        >⬇️ Export CSV</a
+      >
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-red">🔓 Logout</a>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="val">{{ stats.total }}</span>
+      <div class="lbl">Total Tests</div>
+    </div>
+    <div class="stat-card">
+      <span class="val">{{ stats.potato_tests }}</span>
+      <div class="lbl">🥔 Potato</div>
+    </div>
+    <div class="stat-card">
+      <span class="val">{{ stats.tomato_tests }}</span>
+      <div class="lbl">🍅 Tomato</div>
+    </div>
+    <div class="stat-card">
+      <span class="val">
+        {% if stats.avg_confidence %}{{ stats.avg_confidence }}%{% else %}N/A{%
+        endif %}
+      </span>
+      <div class="lbl">Avg Confidence</div>
+    </div>
+    <div class="stat-card">
+      <span class="val">
+        {% if stats.accuracy %}{{ stats.accuracy }}%{% else %}N/A{% endif %}
+      </span>
+      <div class="lbl">Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <span class="val">{{ stats.total_with_actual }}</span>
+      <div class="lbl">Labelled</div>
+    </div>
+  </div>
+
+  <!-- All Tests Table -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>📋 All Predictions</h3>
+      <input
+        class="search-input"
+        type="text"
+        id="searchInput"
+        placeholder="🔍 Search tests..."
+        onkeyup="filterTable()"
+      />
+    </div>
+
+    <div style="overflow-x: auto">
+      <table id="testsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Crop</th>
+            <th>Predicted Disease</th>
+            <th>Confidence</th>
+            <th>Actual Label</th>
+            <th>Correct?</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tests %}
+          <tr>
+            <td><b>{{ t.id }}</b></td>
+            <td>
+              {% if t.crop_type == 'potato' %}
+              <span class="badge badge-potato">🥔 Potato</span>
+              {% elif t.crop_type == 'tomato' %}
+              <span class="badge badge-tomato">🍅 Tomato</span>
+              {% else %}
+              <span class="badge badge-na">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {{ t.predicted | replace("Potato___","") | replace("Tomato__","")
+              | replace("Tomato_","") | replace("_"," ") }}
+            </td>
+            <td>
+              {{ (t.confidence * 100) | round(1) }}%
+              <span class="conf-bar-wrap">
+                <span
+                  class="conf-bar"
+                  style="width:{{ (t.confidence * 100) | round(0) }}%"
+                >
+                </span>
+              </span>
+            </td>
+            <td>{{ t.actual or '—' }}</td>
+            <td>
+              {% if t.correct == 1 %}
+              <span class="badge badge-correct">✅ Yes</span>
+              {% elif t.correct == 0 %}
+              <span class="badge badge-wrong">❌ No</span>
+              {% else %}
+              <span class="badge badge-na">N/A</span>
+              {% endif %}
+            </td>
+            <td style="color: #999; font-size: 0.8rem">
+              {{ t.timestamp[:16] if t.timestamp else '—' }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="no-results">No tests yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#testsTable tbody tr");
+    rows.forEach((row) => {
+      row.style.display = row.innerText.toLowerCase().includes(input)
+        ? ""
+        : "none";
+    });
+  }
+</script>
+
+{% endblock %}

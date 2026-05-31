@@ -1,41 +1,38 @@
 # 🌿 Crop Disease Detection AI
-
 ### फसल रोग पहचान प्रणाली
 
-A deep learning powered web application that detects diseases in **Potato** and **Tomato** leaf images using custom CNN models. Built with Flask, TensorFlow/Keras, and SQLite.
+A deep learning powered web application that detects diseases in **Potato** and **Tomato** leaf images using a custom CNN for potatoes and MobileNetV2 for tomatoes. Built with Flask, TensorFlow/Keras, and SQLite.
 
 ---
 
 ## 📸 Features
 
 - 📷 **Camera Capture** — take leaf photos directly from your device
-- 🤖 **AI Prediction** — custom CNN models with confidence scores
+- 🤖 **AI Prediction** — custom CNN and MobileNetV2 models with confidence scores
 - 📊 **Live Dashboard** — 3 tabs (Overall / Potato / Tomato), auto-refreshed every 4 seconds
 - 🕐 **Test History** — searchable and filterable card grid of all predictions
 - 📋 **PDF Report** — downloadable diagnosis report per test
 - 💊 **Treatment Info** — bilingual (English + Hindi) disease description and treatment
 - 🗄️ **SQLite Database** — all tests stored with crop type, confidence, and timestamp
+- 🔐 **Admin Panel** — secure admin dashboard for managing records
 
 ---
 
 ## 🧠 AI Models
 
-| Model                           | Crop   | Architecture | Input Size | Classes |
-| ------------------------------- | ------ | ------------ | ---------- | ------- |
-| `potato_disease_model.keras`    | Potato | Custom CNN   | 256×256    | 3       |
-| `tomato_disease_model_V2.keras` | Tomato | Custom CNN   | 256×256    | 10      |
+| Model | Crop | Architecture | Input Size | Classes |
+|-------|------|-------------|------------|---------|
+| `potato_disease_model.keras` | Potato | Custom CNN | 256×256 | 3 |
+| `tomato_disease_model_V2.keras` | Tomato | MobileNetV2 | 256×256 | 10 |
 
 ### ⚠️ Important — Baked Preprocessing
-
 Both models were trained with a baked-in `Rescaling(1/255)` layer:
-
 ```python
 resize_and_rescale = tf.keras.Sequential([
     layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),
     layers.Rescaling(1.0/255)
 ])
 ```
-
 The prediction code passes **raw pixel values (0–255)** — do NOT divide by 255 manually or the model will receive near-zero inputs and always predict the same class.
 
 ---
@@ -43,13 +40,11 @@ The prediction code passes **raw pixel values (0–255)** — do NOT divide by 2
 ## 🦠 Supported Disease Classes
 
 ### 🥔 Potato (3 classes)
-
 - Early Blight
 - Late Blight
 - Healthy
 
 ### 🍅 Tomato (10 classes)
-
 - Bacterial Spot
 - Early Blight
 - Late Blight
@@ -65,7 +60,7 @@ The prediction code passes **raw pixel values (0–255)** — do NOT divide by 2
 
 ## 📁 Project Structure
 
-```
+```text
 crop-disease-detection/
 │
 ├── app.py                        # Flask application & routes
@@ -80,13 +75,16 @@ crop-disease-detection/
 │   └── tomato_disease_model_V2.keras
 │
 ├── templates/
+│   ├── about.html                # About page
+│   ├── admin_login.html          # Admin login page
+│   ├── admin.html                # Admin dashboard
 │   ├── base.html                 # Base layout (navbar + footer)
-│   ├── index.html                # Home page (standalone, no extends)
-│   ├── result.html               # Prediction result page
 │   ├── dashboard.html            # Live stats dashboard (3 tabs)
 │   ├── history.html              # Test history card grid
-│   ├── test_detail.html          # Single test detail page
-│   └── about.html                # About page
+│   ├── index.html                # Home page (standalone, no extends)
+│   ├── invalid_image.html        # Invalid image upload error page
+│   ├── result.html               # Prediction result page
+│   └── test_detail.html          # Single test detail page
 │
 ├── static/
 │   ├── uploads/                  # Uploaded/captured leaf images
@@ -115,14 +113,12 @@ crop-disease-detection/
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
-
 ```bash
 git clone https://github.com/SunnyKushwaha272/Crop-Disease-Detection-
 cd crop-disease-detection
 ```
 
 ### 2. Create a virtual environment
-
 ```bash
 python -m venv venv
 
@@ -134,34 +130,30 @@ source venv/bin/activate
 ```
 
 ### 3. Install dependencies
-
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Add your trained models
-
 Place your `.keras` model files in the `saved_model/` folder:
-
-```
+```text
 saved_model/
 ├── potato_disease_model.keras
 └── tomato_disease_model_V2.keras
 ```
 
 ### 5. Run the app
-
 ```bash
 python app.py
 ```
 
-Open your browser at **http://127.0.0.1:5000**
+Open your browser at **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
 
 ---
 
 ## 📦 Requirements
 
-```
+```text
 flask
 tensorflow
 pillow
@@ -171,7 +163,6 @@ werkzeug
 ```
 
 Install all at once:
-
 ```bash
 pip install flask tensorflow pillow numpy reportlab werkzeug
 ```
@@ -196,7 +187,6 @@ CREATE TABLE tests (
 ```
 
 To reset the database (clear all history):
-
 ```bash
 del data\app.db        # Windows
 rm data/app.db         # macOS / Linux
@@ -206,23 +196,25 @@ rm data/app.db         # macOS / Linux
 
 ## 🌐 API Endpoints
 
-| Method | Route                   | Description                      |
-| ------ | ----------------------- | -------------------------------- |
-| GET    | `/`                     | Home page                        |
-| POST   | `/predict`              | Run prediction on uploaded image |
-| GET    | `/dashboard`            | Dashboard page                   |
-| GET    | `/api/dashboard-stats`  | Live JSON stats for dashboard    |
-| GET    | `/history`              | Test history page                |
-| GET    | `/test/<id>`            | Single test detail               |
-| GET    | `/about`                | About page                       |
-| GET    | `/download-report/<id>` | Download PDF report              |
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/` | Home page |
+| POST | `/predict` | Run prediction on uploaded image |
+| GET | `/dashboard` | Dashboard page |
+| GET | `/api/dashboard-stats` | Live JSON stats for dashboard |
+| GET | `/history` | Test history page |
+| GET | `/test/<id>` | Single test detail |
+| GET | `/about` | About page |
+| GET | `/download-report/<id>` | Download PDF report |
+| GET/POST | `/admin/login` | Admin authentication page |
+| GET | `/admin` | Admin dashboard panel |
 
 ---
 
 ## ⚙️ How It Works
 
 1. User selects crop type (Potato / Tomato)
-2. User uploads or captures a leaf image
+2. User uploads or captures a leaf image (validates via `invalid_image.html` on failure)
 3. Flask saves the image and calls `predict_disease()`
 4. Image is resized to 256×256 and passed as raw pixels to the model
 5. Model's baked `Rescaling(1/255)` normalises internally
@@ -259,6 +251,5 @@ rm data/app.db         # macOS / Linux
 
 This project is for educational and research purposes.
 
-## Project Link
-
-https://huggingface.co/spaces/Sunnykushwaha/crop-disease-ai
+## 🔗 Project Link
+[https://huggingface.co/spaces/Sunnykushwaha/crop-disease-ai](https://huggingface.co/spaces/Sunnykushwaha/crop-disease-ai)
