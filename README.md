@@ -1,4 +1,5 @@
 # 🌿 Crop Disease Detection AI
+
 ### फसल रोग पहचान प्रणाली
 
 A deep learning powered web application that detects diseases in **Potato** and **Tomato** leaf images using custom CNN models. Built with Flask, TensorFlow/Keras, and SQLite.
@@ -19,19 +20,22 @@ A deep learning powered web application that detects diseases in **Potato** and 
 
 ## 🧠 AI Models
 
-| Model | Crop | Architecture | Input Size | Classes |
-|-------|------|-------------|------------|---------|
-| `potato_disease_model.keras` | Potato | Custom CNN | 256×256 | 3 |
-| `tomato_disease_model_V2.keras` | Tomato | Custom CNN | 256×256 | 10 |
+| Model                           | Crop   | Architecture | Input Size | Classes |
+| ------------------------------- | ------ | ------------ | ---------- | ------- |
+| `potato_disease_model.keras`    | Potato | Custom CNN   | 256×256    | 3       |
+| `tomato_disease_model_V2.keras` | Tomato | Custom CNN   | 256×256    | 10      |
 
 ### ⚠️ Important — Baked Preprocessing
+
 Both models were trained with a baked-in `Rescaling(1/255)` layer:
+
 ```python
 resize_and_rescale = tf.keras.Sequential([
     layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),
     layers.Rescaling(1.0/255)
 ])
 ```
+
 The prediction code passes **raw pixel values (0–255)** — do NOT divide by 255 manually or the model will receive near-zero inputs and always predict the same class.
 
 ---
@@ -39,11 +43,13 @@ The prediction code passes **raw pixel values (0–255)** — do NOT divide by 2
 ## 🦠 Supported Disease Classes
 
 ### 🥔 Potato (3 classes)
+
 - Early Blight
 - Late Blight
 - Healthy
 
 ### 🍅 Tomato (10 classes)
+
 - Bacterial Spot
 - Early Blight
 - Late Blight
@@ -109,12 +115,14 @@ crop-disease-detection/
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/SunnyKushwaha272/Crop-Disease-Detection-
 cd crop-disease-detection
 ```
 
 ### 2. Create a virtual environment
+
 ```bash
 python -m venv venv
 
@@ -126,12 +134,15 @@ source venv/bin/activate
 ```
 
 ### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Add your trained models
+
 Place your `.keras` model files in the `saved_model/` folder:
+
 ```
 saved_model/
 ├── potato_disease_model.keras
@@ -139,6 +150,7 @@ saved_model/
 ```
 
 ### 5. Run the app
+
 ```bash
 python app.py
 ```
@@ -159,6 +171,7 @@ werkzeug
 ```
 
 Install all at once:
+
 ```bash
 pip install flask tensorflow pillow numpy reportlab werkzeug
 ```
@@ -183,6 +196,7 @@ CREATE TABLE tests (
 ```
 
 To reset the database (clear all history):
+
 ```bash
 del data\app.db        # Windows
 rm data/app.db         # macOS / Linux
@@ -192,16 +206,16 @@ rm data/app.db         # macOS / Linux
 
 ## 🌐 API Endpoints
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/` | Home page |
-| POST | `/predict` | Run prediction on uploaded image |
-| GET | `/dashboard` | Dashboard page |
-| GET | `/api/dashboard-stats` | Live JSON stats for dashboard |
-| GET | `/history` | Test history page |
-| GET | `/test/<id>` | Single test detail |
-| GET | `/about` | About page |
-| GET | `/download-report/<id>` | Download PDF report |
+| Method | Route                   | Description                      |
+| ------ | ----------------------- | -------------------------------- |
+| GET    | `/`                     | Home page                        |
+| POST   | `/predict`              | Run prediction on uploaded image |
+| GET    | `/dashboard`            | Dashboard page                   |
+| GET    | `/api/dashboard-stats`  | Live JSON stats for dashboard    |
+| GET    | `/history`              | Test history page                |
+| GET    | `/test/<id>`            | Single test detail               |
+| GET    | `/about`                | About page                       |
+| GET    | `/download-report/<id>` | Download PDF report              |
 
 ---
 
@@ -246,4 +260,5 @@ rm data/app.db         # macOS / Linux
 This project is for educational and research purposes.
 
 ## Project Link
+
 https://huggingface.co/spaces/Sunnykushwaha/crop-disease-ai
